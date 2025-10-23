@@ -1,0 +1,82 @@
+﻿<Window x:Class="CoffeeShop.Views.Admin.DanhMucWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Quản lý Danh Mục"
+        Height="500" Width="700"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#f0f2f5">
+
+    <Window.Resources>
+        <!-- Style cho nút chức năng -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#007ACC"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="5,2"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Nhập tên danh mục -->
+        <Border Grid.Row="0" Background="White" CornerRadius="8" Padding="15" Margin="0,0,0,15" BorderBrush="#DDD" BorderThickness="1">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Label Content="Tên danh mục:" Width="120" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBox x:Name="txtTenDanhMuc"
+                         Width="350" Height="30"
+                         VerticalContentAlignment="Center"
+                         Padding="5"
+                         ToolTip="Nhập tên danh mục"/>
+            </StackPanel>
+        </Border>
+
+        <!-- DataGrid -->
+        <Border Grid.Row="1" Background="White" CornerRadius="8" Padding="10" BorderBrush="#DDD" BorderThickness="1">
+            <DataGrid x:Name="dgDanhMuc"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      SelectionChanged="dgDanhMuc_SelectionChanged"
+                      LoadingRow="dgDanhMuc_LoadingRow"
+                      AlternatingRowBackground="#f9f9f9"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="None"
+                      RowHeaderWidth="40">
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="STT" Width="50" Binding="{Binding STT}" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Mã danh mục" Width="120" Binding="{Binding MaDanhMuc}" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Tên danh mục" Width="*" Binding="{Binding TenDanhMuc}" IsReadOnly="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- Nút chức năng -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
+            <Button Content="➕ Thêm" Click="BtnThem_Click"/>
+            <Button Content="✏️ Sửa" Click="BtnSua_Click"/>
+            <Button Content="🗑️ Xóa" Click="BtnXoa_Click"/>
+            <Button Content="❌ Đóng" Click="BtnDong_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

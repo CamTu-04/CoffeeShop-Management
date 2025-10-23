@@ -1,0 +1,32 @@
+﻿<Window x:Class="CoffeeShop.Views.Admin.FrmQuanLyBan"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Quản lý bàn" Height="450" Width="600"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Nhãn và ô nhập tên bàn -->
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <StackPanel Orientation="Vertical" Margin="0,0,10,0">
+                <TextBlock Text="Tên bàn" FontWeight="Bold"/>
+                <TextBox x:Name="txtTenBan" Width="200"/>
+            </StackPanel>
+            <Button Content="Thêm" Click="btnThem_Click" Margin="0,0,10,0" Width="80"/>
+            <Button Content="Sửa" Click="btnSua_Click" Margin="0,0,10,0" Width="80"/>
+            <Button Content="Xóa" Click="btnXoa_Click" Width="80"/>
+        </StackPanel>
+
+        <!-- Danh sách bàn -->
+        <DataGrid x:Name="dgBan" Grid.Row="1" AutoGenerateColumns="False" SelectionMode="Single" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="Tên bàn" Binding="{Binding TenBan}" Width="*"/>
+                <DataGridTextColumn Header="Trạng thái" Binding="{Binding TrangThai}" Width="150"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>
