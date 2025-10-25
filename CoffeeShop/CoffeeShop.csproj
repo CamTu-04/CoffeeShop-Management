@@ -97,6 +97,10 @@
     <Compile Include="Migrations\202510230508341_AddHoaDonTables.Designer.cs">
       <DependentUpon>202510230508341_AddHoaDonTables.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202510250548247_CreateNhanVienTable.cs" />
+    <Compile Include="Migrations\202510250548247_CreateNhanVienTable.Designer.cs">
+      <DependentUpon>202510250548247_CreateNhanVienTable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Ban.cs" />
     <Compile Include="Models\ChiTietHoaDon.cs" />
@@ -111,6 +115,9 @@
     </Compile>
     <Compile Include="Views\Admin\DanhMucWindow.xaml.cs">
       <DependentUpon>DanhMucWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Admin\FrmNhanVien.xaml.cs">
+      <DependentUpon>FrmNhanVien.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Admin\FrmQuanLyBan.xaml.cs">
       <DependentUpon>FrmQuanLyBan.xaml</DependentUpon>
@@ -152,6 +159,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Admin\DanhMucWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Admin\FrmNhanVien.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -219,6 +230,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202510230508341_AddHoaDonTables.resx">
       <DependentUpon>202510230508341_AddHoaDonTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202510250548247_CreateNhanVienTable.resx">
+      <DependentUpon>202510250548247_CreateNhanVienTable.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

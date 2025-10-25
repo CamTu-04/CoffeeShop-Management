@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Users\HP\source\repos\CoffeeShop\CoffeeShop\App.xaml
-10-19361322
+11887876789
 
-39-2051969645
+42-1359840305
 161530096695
-MainWindow.xaml;Views\Admin\AdminLoginWindow.xaml;Views\Admin\AdminWindow.xaml;Views\Admin\DanhMucWindow.xaml;Views\Admin\FrmQuanLyBan.xaml;Views\Admin\SanPhamWindow.xaml;Views\FrmBan.xaml;Views\FrmHoaDon.xaml;Views\FrmPhucVu.xaml;Views\LoginWindow.xaml;
+MainWindow.xaml;Views\Admin\AdminLoginWindow.xaml;Views\Admin\AdminWindow.xaml;Views\Admin\DanhMucWindow.xaml;Views\Admin\FrmNhanVien.xaml;Views\Admin\FrmQuanLyBan.xaml;Views\Admin\SanPhamWindow.xaml;Views\FrmBan.xaml;Views\FrmHoaDon.xaml;Views\FrmPhucVu.xaml;Views\LoginWindow.xaml;
 
 False
 

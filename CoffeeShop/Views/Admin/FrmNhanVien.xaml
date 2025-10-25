@@ -1,0 +1,86 @@
+﻿<Window x:Class="CoffeeShop.Views.Admin.FrmNhanVien"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CoffeeShop.Views.Admin"
+        mc:Ignorable="d"
+        Title="Quản lý nhân viên" Height="600" Width="1000"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Form nhập -->
+        <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0,0,0,10">
+            <WrapPanel>
+                <StackPanel Margin="5">
+                    <TextBlock Text="Mã NV"/>
+                    <TextBox x:Name="txtMaNV" Width="120"/>
+                </StackPanel>
+                <StackPanel Margin="5">
+                    <TextBlock Text="Họ tên"/>
+                    <TextBox x:Name="txtHoTen" Width="180"/>
+                </StackPanel>
+                <StackPanel Margin="5">
+                    <TextBlock Text="Giới tính"/>
+                    <ComboBox x:Name="cbGioiTinh" Width="100">
+                        <ComboBoxItem Content="Nam"/>
+                        <ComboBoxItem Content="Nữ"/>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="5">
+                    <TextBlock Text="Địa chỉ"/>
+                    <TextBox x:Name="txtDiaChi" Width="200"/>
+                </StackPanel>
+                <StackPanel Margin="5">
+                    <TextBlock Text="SĐT"/>
+                    <TextBox x:Name="txtSDT" Width="120"/>
+                </StackPanel>
+                <StackPanel Margin="5">
+                    <TextBlock Text="CCCD"/>
+                    <TextBox x:Name="txtCCCD" Width="150"/>
+                </StackPanel>
+            </WrapPanel>
+
+            <WrapPanel>
+                <StackPanel Margin="5">
+                    <TextBlock Text="Chức vụ"/>
+                    <ComboBox x:Name="cbChucVu" Width="120">
+                        <ComboBoxItem Content="Admin"/>
+                        <ComboBoxItem Content="PhucVu"/>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="5">
+                    <TextBlock Text="Tài khoản"/>
+                    <TextBox x:Name="txtTenDangNhap" Width="150"/>
+                </StackPanel>
+                <StackPanel Margin="5">
+                    <TextBlock Text="Mật khẩu"/>
+                    <PasswordBox x:Name="txtMatKhau" Width="150"/>
+                </StackPanel>
+                <Button Content="Thêm" Click="btnThem_Click" Width="80" Margin="5"/>
+                <Button Content="Sửa" Click="btnSua_Click" Width="80" Margin="5"/>
+                <Button Content="Xóa" Click="btnXoa_Click" Width="80" Margin="5"/>
+                <Button Content="Làm mới" Click="btnLamMoi_Click" Width="80" Margin="5"/>
+            </WrapPanel>
+        </StackPanel>
+
+        <!-- Danh sách nhân viên -->
+        <DataGrid x:Name="dgNhanVien" Grid.Row="1" AutoGenerateColumns="False" SelectionChanged="dgNhanVien_SelectionChanged"
+                  CanUserAddRows="False" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Mã NV" Binding="{Binding MaNhanVien}" Width="80"/>
+                <DataGridTextColumn Header="Họ tên" Binding="{Binding HoTen}" Width="150"/>
+                <DataGridTextColumn Header="Giới tính" Binding="{Binding GioiTinh}" Width="80"/>
+                <DataGridTextColumn Header="Địa chỉ" Binding="{Binding DiaChi}" Width="150"/>
+                <DataGridTextColumn Header="SĐT" Binding="{Binding SoDienThoai}" Width="100"/>
+                <DataGridTextColumn Header="CCCD" Binding="{Binding CCCD}" Width="120"/>
+                <DataGridTextColumn Header="Chức vụ" Binding="{Binding ChucVu}" Width="100"/>
+                <DataGridTextColumn Header="Tài khoản" Binding="{Binding TenDangNhap}" Width="120"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

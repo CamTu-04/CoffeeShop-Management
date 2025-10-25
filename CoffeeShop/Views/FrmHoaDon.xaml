@@ -3,26 +3,66 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Gọi món &amp; Hóa đơn" Height="600" Width="900"
         WindowStartupLocation="CenterScreen">
-    <Grid Margin="10">
+    <Grid Margin="15">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2.2*"/>
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Menu -->
+        <!-- ========== CỘT TRÁI: DANH MỤC & MÓN ĂN ========== -->
         <StackPanel Grid.Column="0">
-            <TextBlock Text="Menu món ăn" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-            <ComboBox x:Name="cbDanhMuc" SelectionChanged="cbDanhMuc_SelectionChanged" Margin="0,0,0,10"/>
-            <ListBox x:Name="lstSanPham" DisplayMemberPath="TenSanPham" SelectionChanged="lstSanPham_SelectionChanged"/>
+            <TextBlock Text="Menu món ăn" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
+
+            <!-- Chọn danh mục -->
+            <TextBlock Text="Chọn danh mục:" FontWeight="SemiBold"/>
+            <ComboBox x:Name="cbDanhMuc"
+                      SelectionChanged="cbDanhMuc_SelectionChanged"
+                      Margin="0,5,0,10"
+                      Height="30"/>
+
+            <!-- Danh sách món -->
+            <ListBox x:Name="lstSanPham"
+                     DisplayMemberPath="TenSanPham"
+                     Height="300"
+                     BorderBrush="Gray"
+                     BorderThickness="1"
+                     Margin="0,0,0,10"/>
+
+            <!-- Nhập số lượng + nút Thêm món -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
+                <TextBlock Text="Số lượng:" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                <TextBox x:Name="txtSoLuong"
+                         Width="60"
+                         Text="1"
+                         Margin="5,0,10,0"
+                         VerticalContentAlignment="Center"/>
+                <Button Content="Thêm món"
+                        Width="100"
+                        Height="30"
+                        Background="#2e8b57"
+                        Foreground="White"
+                        Click="btnThemMon_Click"/>
+            </StackPanel>
         </StackPanel>
 
-        <!-- Hóa đơn -->
+        <!-- ========== CỘT PHẢI: HÓA ĐƠN HIỆN TẠI ========== -->
         <StackPanel Grid.Column="1" Margin="20,0,0,0">
-            <TextBlock x:Name="txtTenBan" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-            <ListView x:Name="lvChiTietHoaDon" Height="300">
+            <!-- Tên bàn -->
+            <TextBlock x:Name="txtTenBan"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       Foreground="#2e4a7d"
+                       Margin="0,0,0,15"/>
+
+            <!-- Danh sách chi tiết hóa đơn -->
+            <ListView x:Name="lvChiTietHoaDon"
+                      Height="350"
+                      BorderBrush="Gray"
+                      BorderThickness="1"
+                      Margin="0,0,0,10">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Món" DisplayMemberBinding="{Binding TenSanPham}" Width="150"/>
+                        <GridViewColumn Header="Món" DisplayMemberBinding="{Binding TenSanPham}" Width="180"/>
                         <GridViewColumn Header="SL" DisplayMemberBinding="{Binding SoLuong}" Width="50"/>
                         <GridViewColumn Header="Đơn giá" DisplayMemberBinding="{Binding DonGia}" Width="100"/>
                         <GridViewColumn Header="Thành tiền" DisplayMemberBinding="{Binding ThanhTien}" Width="100"/>
@@ -30,12 +70,42 @@
                 </ListView.View>
             </ListView>
 
-            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+            <!-- Tổng tiền -->
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0" VerticalAlignment="Center">
                 <TextBlock Text="Tổng tiền:" FontSize="16" FontWeight="Bold"/>
-                <TextBlock x:Name="txtTongTien" FontSize="16" FontWeight="Bold" Foreground="DarkGreen" Margin="10,0,0,0"/>
+                <TextBlock x:Name="txtTongTien"
+                           FontSize="16"
+                           FontWeight="Bold"
+                           Foreground="DarkGreen"
+                           Margin="10,0,0,0"/>
             </StackPanel>
 
-            <Button Content="Thanh toán" Click="btnThanhToan_Click" Margin="0,20,0,0" Height="40"/>
+            <!-- Các nút thao tác -->
+            <StackPanel Orientation="Horizontal" Margin="0,25,0,0" HorizontalAlignment="Left">
+                <Button Content="Thanh toán"
+                        Click="btnThanhToan_Click"
+                        Width="120"
+                        Height="40"
+                        Background="#1E90FF"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        Margin="0,0,10,0"/>
+                <Button Content="Tạm ẩn"
+                        Click="btnTamAn_Click"
+                        Width="90"
+                        Height="40"
+                        Background="Gray"
+                        Foreground="White"
+                        FontWeight="Bold"/>
+                <Button Content="Xóa món"
+                        Click="btnXoaMon_Click"
+                        Width="90"
+                        Height="40"
+                        Background="#ff5c5c"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        Margin="10,0,0,0"/>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>

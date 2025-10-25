@@ -38,7 +38,11 @@ namespace CoffeeShop.Views.Admin
             var frm = new FrmQuanLyBan();
             frm.ShowDialog(); // hoặc frm.Show() nếu bạn muốn không chặn cửa sổ chính
         }
-
+        private void BtnNhanVien_Click(object sender, RoutedEventArgs e)
+        {
+            var frm = new FrmNhanVien();
+            frm.ShowDialog(); // hoặc frm.Show() nếu bạn muốn không chặn cửa sổ chính
+        }
 
     }
 }

@@ -14,7 +14,7 @@
                        Margin="0,0,0,20"/>
 
             <UniformGrid Columns="3" Rows="2" Margin="0,10,0,0" HorizontalAlignment="Center">
-                <Button Content="👨‍💼 Quản lý nhân viên" Width="200" Height="80" Margin="10" />
+                <Button Content="👨‍💼 Quản lý nhân viên" Width="200" Height="80" Margin="10" Click="BtnNhanVien_Click"/>
                 <Button Content="🪑 Quản lý bàn" Width="200" Height="80" Margin="10" Click="BtnBan_Click"/>
                 <Button Content="☕ Quản lý sản phẩm" Width="200" Height="80" Margin="10" Click="BtnSanPham_Click"/>
                 <Button Content="🗂️ Quản lý danh mục" Width="200" Height="80" Margin="10" Click="BtnDanhMuc_Click"/>
