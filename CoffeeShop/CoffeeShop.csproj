@@ -106,6 +106,7 @@
     <Compile Include="Models\ChiTietHoaDon.cs" />
     <Compile Include="Models\DanhMuc.cs" />
     <Compile Include="Models\HoaDon.cs" />
+    <Compile Include="Models\Khachhang.cs" />
     <Compile Include="Services\AuthService.cs" />
     <Compile Include="Views\Admin\AdminLoginWindow.xaml.cs">
       <DependentUpon>AdminLoginWindow.xaml</DependentUpon>
@@ -130,6 +131,9 @@
     </Compile>
     <Compile Include="Views\FrmHoaDon.xaml.cs">
       <DependentUpon>FrmHoaDon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\FrmKhachhang.xaml.cs">
+      <DependentUpon>FrmKhachhang.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\FrmPhucVu.xaml.cs">
       <DependentUpon>FrmPhucVu.xaml</DependentUpon>
@@ -179,6 +183,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\FrmHoaDon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\FrmKhachhang.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,284 +1,232 @@
-﻿using CoffeeShop.Data;
-using CoffeeShop.Models;
+﻿// 1. THAY THẾ "CoffeeShop" BẰNG TÊN PROJECT CỦA BẠN
+using CoffeeShop.Models; // Giả sử các Model nằm ở đây
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace CoffeeShop.Views
 {
+    /// <summary>
+    /// Interaction logic for FrmHoaDon.xaml
+    /// </summary>
     public partial class FrmHoaDon : Window
     {
-        private int idBan;
-        private HoaDon hoaDon;
-        private ObservableCollection<ChiTietHoaDonView> chiTietTam;
+        // 2. THAY THẾ "CoffeeShopContext" BẰNG TÊN CONTEXT CỦA BẠN
+        private readonly CoffeeShopContext _context;
+        private string _placeholderText = "Tìm kiếm theo mã HĐ, tên nhân viên...";
 
-        public FrmHoaDon(int idBan)
+        public FrmHoaDon()
         {
             InitializeComponent();
-            this.idBan = idBan;
-            chiTietTam = new ObservableCollection<ChiTietHoaDonView>();
-            lvChiTietHoaDon.ItemsSource = chiTietTam;
-
-            LoadDanhMuc();
-            LoadBanVaHoaDon();
+            _context = new CoffeeShopContext(); // Khởi tạo context
         }
 
-        private void LoadBanVaHoaDon()
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            using (var db = new CoffeeShopContext())
+            LoadData();
+        }
+
+        // Tải dữ liệu chính
+        private void LoadData()
+        {
+            try
             {
-                var ban = db.Bans.Find(idBan);
-                if (ban == null)
+                // 3. THAY THẾ CÁC TÊN DBSET "HoaDons", "NhanVien", "KhachHang", "ChiTietHoaDons", "SanPham"
+                var hoaDonList = _context.HoaDons
+                    .Include(hd => hd.NhanVien)      // Tải thông tin Nhân viên
+                    .Include(hd => hd.KhachHang)     // Tải thông tin Khách hàng
+                    .Include(hd => hd.ChiTietHoaDons) // Tải danh sách Chi tiết
+                        .ThenInclude(ct => ct.SanPham) // Trong Chi tiết, tải luôn thông tin Sản phẩm
+                    .AsNoTracking()
+                    .OrderByDescending(hd => hd.NgayLap)
+                    .ToList();
+
+                dgHoaDon.ItemsSource = hoaDonList;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi tải dữ liệu: {ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // Lọc dữ liệu (kết hợp cả tìm kiếm và chọn ngày)
+        private void FilterData()
+        {
+            try
+            {
+                string searchText = txtTimKiem.Text.ToLower().Trim();
+                DateTime? selectedDate = dpLocNgay.SelectedDate;
+
+                // 4. THAY THẾ TÊN DBSET "HoaDons" VÀ CÁC MODEL
+                var query = _context.HoaDons
+                    .Include(hd => hd.NhanVien)
+                    .Include(hd => hd.KhachHang)
+                    .Include(hd => hd.ChiTietHoaDons)
+                        .ThenInclude(ct => ct.SanPham)
+                    .AsNoTracking();
+
+                // Lọc theo text tìm kiếm
+                if (!string.IsNullOrEmpty(searchText) && searchText != _placeholderText.ToLower())
                 {
-                    MessageBox.Show("Không tìm thấy bàn!");
-                    Close();
-                    return;
+                    query = query.Where(hd =>
+                        hd.MaHoaDon.ToLower().Contains(searchText) ||
+                        (hd.NhanVien != null && hd.NhanVien.TenNV.ToLower().Contains(searchText)) ||
+                        (hd.KhachHang != null && hd.KhachHang.TenKH.ToLower().Contains(searchText))
+                    );
                 }
 
-                txtTenBan.Text = $"Bàn: {ban.TenBan}";
-
-                // Nếu có hóa đơn đang mở (TrangThai = "Đang mở") thì load nó
-                hoaDon = db.HoaDons.FirstOrDefault(h => h.IdBan == idBan && h.TrangThai == "Đang mở");
-
-                if (hoaDon != null)
+                // Lọc theo ngày
+                if (selectedDate.HasValue)
                 {
-                    // Load chi tiết hóa đơn đang mở (join để lấy TenSanPham)
-                    var chiTietCu = (from ct in db.ChiTietHoaDons
-                                     join sp in db.SanPhams on ct.IdSanPham equals sp.MaSanPham
-                                     where ct.IdHoaDon == hoaDon.Id
-                                     select new ChiTietHoaDonView
-                                     {
-                                         IdSanPham = ct.IdSanPham,
-                                         TenSanPham = sp.TenSanPham,
-                                         SoLuong = ct.SoLuong,
-                                         DonGia = ct.DonGia
-                                     }).ToList();
-
-                    chiTietTam.Clear();
-                    foreach (var item in chiTietCu)
-                        chiTietTam.Add(item);
+                    query = query.Where(hd => hd.NgayLap.Date == selectedDate.Value.Date);
                 }
-                else
+
+                dgHoaDon.ItemsSource = query.OrderByDescending(hd => hd.NgayLap).ToList();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi lọc dữ liệu: {ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        #region Xử lý Sự kiện
+
+        // Khi chọn một hóa đơn, bật nút In
+        private void dgHoaDon_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            btnInHoaDon.IsEnabled = (dgHoaDon.SelectedItem != null);
+
+            // Ghi chú: Việc hiển thị chi tiết (bên phải) được xử lý tự động
+            // bằng Data Binding trong XAML, bao gồm cả bảng Chi tiết sản phẩm.
+        }
+
+        // Mở form Bán hàng để tạo Hóa đơn mới
+        private void btnThem_Click(object sender, RoutedEventArgs e)
+        {
+            // 5. THAY THẾ "FrmBanHang" BẰNG TÊN FORM BÁN HÀNG CỦA BẠN
+            // Thông thường, Hóa đơn được tạo từ một form Bán hàng (POS)
+            var frmBanHang = new FrmBanHang(); // Giả sử bạn có form FrmBanHang
+            frmBanHang.ShowDialog();
+
+            // Sau khi form Bán hàng đóng, tải lại danh sách hóa đơn
+            LoadData();
+        }
+
+        // Xóa hóa đơn
+        private void btnXoa_Click(object sender, RoutedEventArgs e)
+        {
+            // 6. THAY THẾ "HoaDon"
+            if (dgHoaDon.SelectedItem is HoaDon selectedHoaDon)
+            {
+                var result = MessageBox.Show($"Bạn có chắc chắn muốn xóa Hóa đơn '{selectedHoaDon.MaHoaDon}' không? " +
+                                             "Thao tác này không thể hoàn tác.",
+                                             "Xác nhận xóa",
+                                             MessageBoxButton.YesNo,
+                                             MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
                 {
-                    // Nếu bàn trống thì tạo hóa đơn mới (tạo và lưu vào DB ngay để có Id)
-                    hoaDon = new HoaDon
+                    try
                     {
-                        IdBan = idBan,
-                        ThoiGian = DateTime.Now,
-                        TrangThai = "Đang mở",
-                        TongTien = 0
-                    };
+                        // 7. THAY THẾ TÊN DBSET "HoaDons", "ChiTietHoaDons"
 
-                    db.HoaDons.Add(hoaDon);
-                    ban.TrangThai = "Đang phục vụ";
-                    db.SaveChanges(); // -> đảm bảo hoaDon.Id có giá trị
+                        // Phải tìm lại Hóa đơn trong context để xóa
+                        var hoaDonToDelete = _context.HoaDons
+                            .Include(hd => hd.ChiTietHoaDons) // Phải xóa các chi tiết trước
+                            .SingleOrDefault(hd => hd.MaHoaDon == selectedHoaDon.MaHoaDon);
+
+                        if (hoaDonToDelete != null)
+                        {
+                            // Xóa các chi tiết (dòng con)
+                            _context.ChiTietHoaDons.RemoveRange(hoaDonToDelete.ChiTietHoaDons);
+
+                            // Xóa hóa đơn (dòng cha)
+                            _context.HoaDons.Remove(hoaDonToDelete);
+
+                            _context.SaveChanges();
+
+                            MessageBox.Show("Xóa hóa đơn thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                            LoadData();
+                        }
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        MessageBox.Show("Không thể xóa hóa đơn này. Có thể có dữ liệu liên quan khác.\nChi tiết: " + ex.InnerException?.Message, "Lỗi ràng buộc", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Lỗi khi xóa: {ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
-
-                CapNhatTongTien();
-            }
-        }
-
-        private void LoadDanhMuc()
-        {
-            using (var db = new CoffeeShopContext())
-            {
-                cbDanhMuc.ItemsSource = db.DanhMucs.ToList();
-                cbDanhMuc.DisplayMemberPath = "TenDanhMuc";
-                if (cbDanhMuc.Items.Count > 0) cbDanhMuc.SelectedIndex = 0;
-            }
-        }
-
-        private void cbDanhMuc_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var danhMuc = cbDanhMuc.SelectedItem as DanhMuc;
-            if (danhMuc != null)
-            {
-                using (var db = new CoffeeShopContext())
-                {
-                    lstSanPham.ItemsSource = db.SanPhams
-                        .Where(s => s.MaDanhMuc == danhMuc.MaDanhMuc)
-                        .ToList();
-                    lstSanPham.DisplayMemberPath = "TenSanPham";
-                }
-            }
-        }
-
-        // Khi nhấn "Thêm món" -> thêm vào cả in-memory và DB (nếu đã có hoaDon.Id)
-        private void btnThemMon_Click(object sender, RoutedEventArgs e)
-        {
-            var sanPham = lstSanPham.SelectedItem as SanPham;
-            if (sanPham == null)
-            {
-                MessageBox.Show("Vui lòng chọn sản phẩm!");
-                return;
-            }
-
-            int soLuong = 1;
-            int.TryParse(txtSoLuong.Text, out soLuong);
-            if (soLuong <= 0) soLuong = 1;
-
-            // cập nhật in-memory collection
-            var chiTiet = chiTietTam.FirstOrDefault(c => c.IdSanPham == sanPham.MaSanPham);
-            if (chiTiet != null)
-            {
-                chiTiet.SoLuong += soLuong;
             }
             else
             {
-                chiTiet = new ChiTietHoaDonView
-                {
-                    IdSanPham = sanPham.MaSanPham,
-                    TenSanPham = sanPham.TenSanPham,
-                    SoLuong = soLuong,
-                    DonGia = sanPham.Gia.GetValueOrDefault(0) // phòng trường hợp nullable
-                };
-                chiTietTam.Add(chiTiet);
+                MessageBox.Show("Vui lòng chọn một hóa đơn để xóa.", "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-
-            // ghi/ cập nhật vào DB ngay để đảm bảo khi tạm ẩn hoặc chuyển bàn vẫn còn
-            using (var db = new CoffeeShopContext())
-            {
-                // lấy hóa đơn từ DB để tránh conflict
-                var hdDb = db.HoaDons.Find(hoaDon.Id);
-                if (hdDb == null)
-                {
-                    MessageBox.Show("Không tìm thấy hóa đơn (DB). Vui lòng thử lại.");
-                    return;
-                }
-
-                // tìm chi tiết trong DB
-                var ctDb = db.ChiTietHoaDons.FirstOrDefault(c => c.IdHoaDon == hdDb.Id && c.IdSanPham == sanPham.MaSanPham);
-                if (ctDb != null)
-                {
-                    ctDb.SoLuong += soLuong;
-                    // giữ DonGia (hoặc cập nhật nếu cần)
-                }
-                else
-                {
-                    db.ChiTietHoaDons.Add(new ChiTietHoaDon
-                    {
-                        IdHoaDon = hdDb.Id,
-                        IdSanPham = sanPham.MaSanPham,
-                        SoLuong = soLuong,
-                        DonGia = sanPham.Gia.GetValueOrDefault(0)
-                    });
-                }
-
-                // cập nhật tổng tiền hóa đơn trong DB
-                hdDb.TongTien = db.ChiTietHoaDons
-                                    .Where(x => x.IdHoaDon == hdDb.Id)
-                                    .AsEnumerable() // để tính trên client (decimal)
-                                    .Sum(x => x.DonGia * x.SoLuong);
-
-                db.SaveChanges();
-            }
-
-            lvChiTietHoaDon.Items.Refresh();
-            CapNhatTongTien();
         }
 
-        // Xóa món: xóa cả in-memory và DB
-        private void btnXoaMon_Click(object sender, RoutedEventArgs e)
+        // Tải lại dữ liệu
+        private void btnLamMoi_Click(object sender, RoutedEventArgs e)
         {
-            var item = lvChiTietHoaDon.SelectedItem as ChiTietHoaDonView;
-            if (item == null)
-            {
-                MessageBox.Show("Hãy chọn món cần xóa!");
-                return;
-            }
-
-            if (MessageBox.Show($"Xóa {item.TenSanPham} khỏi hóa đơn?", "Xác nhận", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
-                return;
-
-            // remove in-memory
-            chiTietTam.Remove(item);
-
-            // remove in DB
-            using (var db = new CoffeeShopContext())
-            {
-                var ctDb = db.ChiTietHoaDons.FirstOrDefault(c => c.IdHoaDon == hoaDon.Id && c.IdSanPham == item.IdSanPham);
-                if (ctDb != null)
-                {
-                    db.ChiTietHoaDons.Remove(ctDb);
-                }
-
-                // cập nhật tổng tiền hóa đơn
-                var hdDb = db.HoaDons.Find(hoaDon.Id);
-                if (hdDb != null)
-                {
-                    hdDb.TongTien = db.ChiTietHoaDons
-                                     .Where(x => x.IdHoaDon == hdDb.Id)
-                                     .AsEnumerable()
-                                     .Sum(x => x.DonGia * x.SoLuong);
-                }
-
-                db.SaveChanges();
-            }
-
-            lvChiTietHoaDon.Items.Refresh();
-            CapNhatTongTien();
+            txtTimKiem.Text = _placeholderText;
+            txtTimKiem.Foreground = Brushes.Gray;
+            dpLocNgay.SelectedDate = null;
+            LoadData();
         }
 
-        private void CapNhatTongTien()
+        // Xử lý in (hiện tại chỉ là thông báo)
+        private void btnInHoaDon_Click(object sender, RoutedEventArgs e)
         {
-            decimal tong = chiTietTam.Sum(c => c.ThanhTien);
-            txtTongTien.Text = $"{tong:N0} đ";
-        }
-
-        // Thanh toán: đánh dấu hóa đơn "Đã thanh toán" và đóng
-        private void btnThanhToan_Click(object sender, RoutedEventArgs e)
-        {
-            if (chiTietTam.Count == 0)
+            if (dgHoaDon.SelectedItem is HoaDon selectedHoaDon)
             {
-                MessageBox.Show("Hóa đơn trống! Vui lòng chọn món trước khi thanh toán.");
-                return;
+                MessageBox.Show($"Đang chuẩn bị in hóa đơn {selectedHoaDon.MaHoaDon}...", "Thông báo in", MessageBoxButton.OK, MessageBoxImage.Information);
+                // Đây là nơi bạn sẽ thêm logic in ấn thực tế
             }
-
-            using (var db = new CoffeeShopContext())
-            {
-                var hd = db.HoaDons.Find(hoaDon.Id);
-                if (hd == null)
-                {
-                    MessageBox.Show("Không tìm thấy hóa đơn trong cơ sở dữ liệu!");
-                    return;
-                }
-
-                hd.TongTien = chiTietTam.Sum(c => c.ThanhTien);
-                hd.TrangThai = "Đã thanh toán";
-
-                // (Chú ý) Chi tiết đã được lưu từng bước khi thêm/xóa, nên ở đây chỉ cần đảm bảo DB đúng
-                // cập nhật lại tổng tiền (just in case)
-                db.SaveChanges();
-
-                var ban = db.Bans.Find(idBan);
-                if (ban != null)
-                {
-                    ban.TrangThai = "Trống";
-                }
-
-                db.SaveChanges();
-            }
-
-            MessageBox.Show("Thanh toán thành công!");
-            this.Close();
         }
 
-        // Tạm ẩn: chỉ ẩn cửa sổ, dữ liệu đã nằm ở DB nên khi mở lại sẽ load
-        private void btnTamAn_Click(object sender, RoutedEventArgs e)
+        // Lọc khi gõ text
+        private void txtTimKiem_TextChanged(object sender, TextChangedEventArgs e)
         {
-            this.Hide();
+            if (IsLoaded) // Chỉ lọc khi window đã load xong
+            {
+                FilterData();
+            }
         }
-    }
 
-    // Lớp hỗ trợ hiển thị chi tiết hóa đơn (không ảnh hưởng model thật)
-    public class ChiTietHoaDonView
-    {
-        public int IdSanPham { get; set; }
-        public string TenSanPham { get; set; }
-        public int SoLuong { get; set; }
-        public decimal DonGia { get; set; }
-        public decimal ThanhTien => DonGia * SoLuong;
+        // Lọc khi chọn ngày
+        private void dpLocNgay_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (IsLoaded)
+            {
+                FilterData();
+            }
+        }
+
+        #endregion
+
+        #region Xử lý Placeholder cho ô tìm kiếm
+
+        private void txtTimKiem_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (txtTimKiem.Text == _placeholderText)
+            {
+                txtTimKiem.Text = "";
+                txtTimKiem.Foreground = Brushes.Black;
+            }
+        }
+
+        private void txtTimKiem_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtTimKiem.Text))
+            {
+                txtTimKiem.Text = _placeholderText;
+                txtTimKiem.Foreground = Brushes.Gray;
+            }
+        }
+
+        #endregion
     }
 }

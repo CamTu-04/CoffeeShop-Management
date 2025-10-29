@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\HP\source\repos\CoffeeShop\CoffeeShop\obj\Debug\
+C:\Users\MY COMPUTER\CoffeeShop-Management\CoffeeShop\obj\Debug\
 CoffeeShop
 none
 false
 DEBUG;TRACE
-C:\Users\HP\source\repos\CoffeeShop\CoffeeShop\App.xaml
-11887876789
+C:\Users\MY COMPUTER\CoffeeShop-Management\CoffeeShop\App.xaml
+12727381801
 
-42-1359840305
-161530096695
-MainWindow.xaml;Views\Admin\AdminLoginWindow.xaml;Views\Admin\AdminWindow.xaml;Views\Admin\DanhMucWindow.xaml;Views\Admin\FrmNhanVien.xaml;Views\Admin\FrmQuanLyBan.xaml;Views\Admin\SanPhamWindow.xaml;Views\FrmBan.xaml;Views\FrmHoaDon.xaml;Views\FrmPhucVu.xaml;Views\LoginWindow.xaml;
+44260080194
+161965929099
+MainWindow.xaml;Views\Admin\AdminLoginWindow.xaml;Views\Admin\AdminWindow.xaml;Views\Admin\DanhMucWindow.xaml;Views\Admin\FrmNhanVien.xaml;Views\Admin\FrmQuanLyBan.xaml;Views\Admin\SanPhamWindow.xaml;Views\FrmBan.xaml;Views\FrmHoaDon.xaml;Views\FrmKhachhang.xaml;Views\FrmPhucVu.xaml;Views\LoginWindow.xaml;
 
-False
+True
 

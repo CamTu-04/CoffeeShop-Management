@@ -1,139 +1,136 @@
-﻿using CoffeeShop.Data;
-using CoffeeShop.Models;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Shapes;
+using System.Windows.Media.Imaging;
 
 namespace CoffeeShop.Views
 {
     public partial class FrmBan : UserControl
     {
+        public class ChiTietHoaDon
+        {
+            public string TenMon { get; set; }
+            public int SoLuong { get; set; }
+            public double Gia { get; set; }
+            public double ThanhTien => SoLuong * Gia;
+        }
+
+        ObservableCollection<ChiTietHoaDon> dsHoaDon = new();
+
         public FrmBan()
         {
             InitializeComponent();
-            LoadBan();
+            dgHoaDon.ItemsSource = dsHoaDon;
+            TaoDanhSachBan();
+            TaoDanhSachMon();
         }
 
-        private void LoadBan()
+        void TaoDanhSachBan()
         {
-            wrapPanelBan.Children.Clear();
-
-            using (var db = new CoffeeShopContext())
+            for (int i = 1; i <= 8; i++)
             {
-                var danhSachBan = db.Bans.ToList();
-
-                foreach (var ban in danhSachBan)
+                Button btn = new Button()
                 {
-                    // --- Tạo layout hiển thị bàn ---
-                    var border = new Border
-                    {
-                        Width = 120,
-                        Height = 120,
-                        Margin = new Thickness(8),
-                        CornerRadius = new CornerRadius(12),
-                        BorderBrush = Brushes.Gray,
-                        BorderThickness = new Thickness(1),
-                        Background = Brushes.White,
-                        Effect = new System.Windows.Media.Effects.DropShadowEffect
-                        {
-                            Color = Colors.Black,
-                            Direction = 320,
-                            ShadowDepth = 4,
-                            Opacity = 0.3
-                        }
-                    };
-
-                    var stack = new StackPanel
-                    {
-                        VerticalAlignment = VerticalAlignment.Center,
-                        HorizontalAlignment = HorizontalAlignment.Center
-                    };
-
-                    // Tên bàn
-                    var tenBan = new TextBlock
-                    {
-                        Text = ban.TenBan.ToUpper(),
-                        FontWeight = FontWeights.Bold,
-                        FontSize = 16,
-                        TextAlignment = TextAlignment.Center,
-                        Margin = new Thickness(0, 8, 0, 4)
-                    };
-
-                    // Trạng thái bàn
-                    var trangThaiText = new TextBlock
-                    {
-                        FontSize = 13,
-                        TextAlignment = TextAlignment.Center,
-                        FontWeight = FontWeights.SemiBold,
-                        Margin = new Thickness(0, 4, 0, 0)
-                    };
-
-                    // --- Gán màu và trạng thái ---
-                    string trangThai = ban.TrangThai?.Trim().ToLower();
-
-                    if (trangThai == "trống")
-                    {
-                        border.Background = new SolidColorBrush(Color.FromRgb(204, 255, 204)); // xanh nhạt
-                        trangThaiText.Text = "Trống";
-                        trangThaiText.Foreground = Brushes.Green;
-                    }
-                    else if (trangThai == "đang phục vụ")
-                    {
-                        border.Background = new SolidColorBrush(Color.FromRgb(255, 249, 196)); // vàng nhạt
-                        trangThaiText.Text = "Đang phục vụ";
-                        trangThaiText.Foreground = Brushes.DarkGoldenrod;
-                    }
-                    else if (trangThai == "đã thanh toán")
-                    {
-                        border.Background = new SolidColorBrush(Color.FromRgb(255, 204, 204)); // đỏ nhạt
-                        trangThaiText.Text = "Đã thanh toán";
-                        trangThaiText.Foreground = Brushes.DarkRed;
-                    }
-                    else
-                    {
-                        border.Background = Brushes.LightGray;
-                        trangThaiText.Text = "Không xác định";
-                        trangThaiText.Foreground = Brushes.Gray;
-                    }
-
-                    // Nút bấm bao quanh bàn
-                    var btn = new Button
-                    {
-                        Content = stack,
-                        Background = Brushes.Transparent,
-                        BorderBrush = Brushes.Transparent,
-                        Cursor = System.Windows.Input.Cursors.Hand,
-                        Tag = ban.Id
-                    };
-
-                    // Thêm text vào StackPanel
-                    stack.Children.Add(tenBan);
-                    stack.Children.Add(trangThaiText);
-
-                    // Gán sự kiện click
-                    btn.Click += Btn_Click;
-
-                    // Thêm vào Border
-                    border.Child = btn;
-                    wrapPanelBan.Children.Add(border);
-                }
+                    Content = $"Bàn {i}",
+                    Width = 90,
+                    Height = 70,
+                    Margin = new Thickness(5),
+                    Background = Brushes.MediumSeaGreen,
+                    Foreground = Brushes.White,
+                    FontWeight = FontWeights.Bold,
+                    BorderThickness = new Thickness(0),
+                    Cursor = System.Windows.Input.Cursors.Hand
+                };
+                btn.Click += BtnBan_Click;
+                wrapPanelBan.Children.Add(btn);
             }
         }
 
-        private void Btn_Click(object sender, RoutedEventArgs e)
+        void BtnBan_Click(object sender, RoutedEventArgs e)
         {
             Button btn = sender as Button;
-            int idBan = (int)btn.Tag;
+            txtBanHienTai.Text = $"Bàn: {btn.Content}";
+            dsHoaDon.Clear(); // reset bill khi chọn bàn mới
+            CapNhatTongTien();
+        }
 
-            FrmHoaDon frm = new FrmHoaDon(idBan);
-            frm.Closed += (s, args) =>
+        void TaoDanhSachMon()
+        {
+            ThemMon(wrapMonCafe, "Cà phê sữa", "Images/caphesua.png", 25000);
+            ThemMon(wrapMonCafe, "Cà phê đen", "Images/capheden.png", 20000);
+            ThemMon(wrapMonCafe, "Bạc xỉu", "Images/bacxiu.png", 30000);
+            ThemMon(wrapMonSinhTo, "Sinh tố bơ", "Images/sinhtobo.png", 35000);
+            ThemMon(wrapMonBanh, "Bánh flan", "Images/banhflan.png", 25000);
+        }
+
+        void ThemMon(WrapPanel panel, string tenMon, string duongDanAnh, double gia)
+        {
+            Border card = new Border()
             {
-                // Khi đóng (tạm ẩn hoặc thanh toán), load lại trạng thái bàn
-                LoadBan();
+                Width = 150,
+                Height = 160,
+                Background = Brushes.White,
+                Margin = new Thickness(10),
+                CornerRadius = new CornerRadius(10),
+                BorderBrush = Brushes.LightGray,
+                BorderThickness = new Thickness(1),
+                Cursor = System.Windows.Input.Cursors.Hand
             };
-            frm.Show();
+
+            StackPanel sp = new StackPanel();
+            Image img = new Image()
+            {
+                Source = new BitmapImage(new System.Uri(duongDanAnh, System.UriKind.Relative)),
+                Height = 90,
+                Margin = new Thickness(5)
+            };
+            TextBlock name = new TextBlock()
+            {
+                Text = tenMon,
+                FontWeight = FontWeights.Bold,
+                TextAlignment = TextAlignment.Center
+            };
+            TextBlock price = new TextBlock()
+            {
+                Text = gia.ToString("N0") + " đ",
+                Foreground = Brushes.DarkSlateGray,
+                TextAlignment = TextAlignment.Center
+            };
+
+            sp.Children.Add(img);
+            sp.Children.Add(name);
+            sp.Children.Add(price);
+            card.Child = sp;
+
+            card.MouseLeftButtonUp += (s, e) =>
+            {
+                ThemVaoHoaDon(tenMon, gia);
+            };
+
+            panel.Children.Add(card);
+        }
+
+        void ThemVaoHoaDon(string tenMon, double gia)
+        {
+            var mon = dsHoaDon.FirstOrDefault(m => m.TenMon == tenMon);
+            if (mon != null)
+            {
+                mon.SoLuong++;
+            }
+            else
+            {
+                dsHoaDon.Add(new ChiTietHoaDon { TenMon = tenMon, SoLuong = 1, Gia = gia });
+            }
+            dgHoaDon.Items.Refresh();
+            CapNhatTongTien();
+        }
+
+        void CapNhatTongTien()
+        {
+            double tong = dsHoaDon.Sum(m => m.ThanhTien);
+            txtTongTien.Text = tong.ToString("N0") + " đ";
         }
     }
 }
